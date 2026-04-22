@@ -58,8 +58,28 @@ func (s *InboundService) GetInbounds(userId int) ([]*model.Inbound, error) {
 	return inbounds, nil
 }
 
+import (
+	"os"
+	"strconv"
+	"strings"
+)
+
 func getTrafficMultiplier() float64 {
-	return 1.5 // تست
+	data, err := os.ReadFile("/etc/x-ui/multiplier")
+	if err != nil {
+		return 1.0
+	}
+
+	val, err := strconv.ParseFloat(strings.TrimSpace(string(data)), 64)
+	if err != nil {
+		return 1.0
+	}
+
+	if val <= 0 {
+		return 1.0
+	}
+
+	return val
 }
 // GetAllInbounds retrieves all inbounds from the database.
 // Returns a slice of all inbound models with their associated client statistics.
