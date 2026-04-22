@@ -2341,11 +2341,11 @@ show_menu() {
     26)
         run_speedtest
 		;;
-	26)
+	27)
 	    set_traffic_multiplier
 		;;
     *)
-        LOGE "Please enter the correct number [0-26]"
+        LOGE "Please enter the correct number [0-27]"
         ;;
     esac
 }
