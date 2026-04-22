@@ -4,6 +4,8 @@ package service
 
 import (
 	"encoding/json"
+	"os"
+	"strconv"
 	"fmt"
 	"sort"
 	"strconv"
@@ -57,12 +59,6 @@ func (s *InboundService) GetInbounds(userId int) ([]*model.Inbound, error) {
 	}
 	return inbounds, nil
 }
-
-import (
-	"os"
-	"strconv"
-	"strings"
-)
 
 func getTrafficMultiplier() float64 {
 	data, err := os.ReadFile("/etc/x-ui/multiplier")
