@@ -927,6 +927,27 @@ update_all_geofiles() {
     update_geofiles "RU"
 }
 
+set_traffic_multiplier() {
+    read -rp "Enter multiplier (e.g. 1.5): " mult
+
+    if [[ -z "$mult" ]]; then
+        echo "Cancelled"
+        return
+    fi
+
+    if ! [[ "$mult" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        echo "Invalid number"
+        return
+    fi
+
+    mkdir -p /etc/x-ui
+    echo "$mult" > /etc/x-ui/multiplier
+
+    echo "Multiplier set to $mult"
+
+    read -n 1 -s -r -p "Press any key to continue..."
+}
+
 update_geofiles() {
     case "${1}" in
       "main") dat_files=(geoip geosite); dat_source="Loyalsoldier/v2ray-rules-dat";;
@@ -2231,7 +2252,8 @@ show_menu() {
 │────────────────────────────────────────────────│
 │  ${green}24.${plain} Enable BBR                                │
 │  ${green}25.${plain} Update Geo Files                          │
-│  ${green}26.${plain} Speedtest by Ookla                        │
+│  ${green}26.${plain} Speedtest by Ookla   
+│  ${green}27.${plain} Set Traffic Multiplier
 ╚────────────────────────────────────────────────╝
 "
     show_status
@@ -2318,7 +2340,10 @@ show_menu() {
         ;;
     26)
         run_speedtest
-        ;;
+		;;
+	26)
+	    set_traffic_multiplier
+		;;
     *)
         LOGE "Please enter the correct number [0-26]"
         ;;
