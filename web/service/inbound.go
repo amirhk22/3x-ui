@@ -9,7 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"math"
+	
 	"github.com/mhsanaei/3x-ui/v2/database"
 	"github.com/mhsanaei/3x-ui/v2/database/model"
 	"github.com/mhsanaei/3x-ui/v2/logger"
@@ -57,6 +58,9 @@ func (s *InboundService) GetInbounds(userId int) ([]*model.Inbound, error) {
 	return inbounds, nil
 }
 
+func getTrafficMultiplier() float64 {
+	return 1.5 // تست
+}
 // GetAllInbounds retrieves all inbounds from the database.
 // Returns a slice of all inbound models with their associated client statistics.
 func (s *InboundService) GetAllInbounds() ([]*model.Inbound, error) {
@@ -1120,11 +1124,16 @@ func (s *InboundService) addClientTraffic(tx *gorm.DB, traffics []*xray.ClientTr
 	for dbTraffic_index := range dbClientTraffics {
 		for traffic_index := range traffics {
 			if dbClientTraffics[dbTraffic_index].Email == traffics[traffic_index].Email {
-				dbClientTraffics[dbTraffic_index].Up += traffics[traffic_index].Up
-				dbClientTraffics[dbTraffic_index].Down += traffics[traffic_index].Down
-				dbClientTraffics[dbTraffic_index].AllTime += (traffics[traffic_index].Up + traffics[traffic_index].Down)
+				multiplier := getTrafficMultiplier()
 
-				// Add user in onlineUsers array on traffic
+				up := int64(math.Round(float64(traffics[traffic_index].Up) * multiplier))
+				down := int64(math.Round(float64(traffics[traffic_index].Down) * multiplier))
+				
+				dbClientTraffics[dbTraffic_index].Up += up
+				dbClientTraffics[dbTraffic_index].Down += down
+				dbClientTraffics[dbTraffic_index].AllTime += (up + down)
+				
+				// online check باید با مقدار واقعی باشه نه ضرب‌شده
 				if traffics[traffic_index].Up+traffics[traffic_index].Down > 0 {
 					onlineClients = append(onlineClients, traffics[traffic_index].Email)
 					dbClientTraffics[dbTraffic_index].LastOnline = time.Now().UnixMilli()
